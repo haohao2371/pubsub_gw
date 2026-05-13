@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import {
   BROKERS,
@@ -12,6 +12,8 @@ import { BrokerRoute, PublishMessageRequest, PublishedMessageResponse } from './
 
 @Injectable()
 export class PubSubService {
+  private readonly logger = new Logger(PubSubService.name);
+
   listChannels(): ChannelDefinition[] {
     return CHANNELS.map((channelName) => CHANNEL_DEFINITIONS[channelName]);
   }
@@ -42,6 +44,10 @@ export class PubSubService {
       delivery: this.buildRoute(request.broker, request.channel),
       payload: request.payload,
     };
+  }
+
+  handleKafkaPaymentsEvent(message: unknown): void {
+    this.logger.log(`Received Kafka payments event: ${JSON.stringify(message)}`);
   }
 
   private assertValidBroker(broker: string): asserts broker is MessageBroker {
