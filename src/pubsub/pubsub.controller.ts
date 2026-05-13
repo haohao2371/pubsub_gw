@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
+import { EventPattern, Payload } from '@nestjs/microservices';
 import { ChannelDefinition } from './pubsub.constants';
 import { PublishMessageRequest, PublishedMessageResponse } from './pubsub.types';
 import { PubSubService } from './pubsub.service';
@@ -20,5 +21,10 @@ export class PubSubController {
   @Post('publish')
   publish(@Body() body: PublishMessageRequest): PublishedMessageResponse {
     return this.pubSubService.publish(body);
+  }
+
+  @EventPattern('payments')
+  handlePaymentsEvent(@Payload() message: unknown): void {
+    this.pubSubService.handleKafkaPaymentsEvent(message);
   }
 }
